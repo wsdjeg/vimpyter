@@ -17,9 +17,10 @@ endfunction
 
 " Insert python block recognized by notedown
 function! vimpyter#insertPythonBlock()
-  exec 'normal!i```{.python .input}'
-  exec 'normal!o```'
-  exec 'normal!O'
+  call setline(line('.'), '```{.python .input}')
+  call append(line('.'), ['', '```'])
+  normal! j
+  startinsert
 endfunction
 
 " Asynchronously starts notebook loader for original file
@@ -57,14 +58,14 @@ function! vimpyter#updateNotebook()
       endif
     endfunction
 
-  "Set the last updated file flag (job_id in case of neovim)
-  "(see function below: vimpyter#notebookUpdatesFinished())
-  let g:vimpyter_internal_last_save_flag = jobstart(
-        \ 'notedown --from markdown --to notebook ' . b:proxy_file .
-        \ ' > ' . b:original_file,
-        \ {
-        \  'on_exit': function('s:updateSuccessNeovim')
-        \ })
+    "Set the last updated file flag (job_id in case of neovim)
+    "(see function below: vimpyter#notebookUpdatesFinished())
+    let g:vimpyter_internal_last_save_flag = jobstart(
+          \ 'notedown --from markdown --to notebook ' . b:proxy_file .
+          \ ' > ' . b:original_file,
+          \ {
+          \  'on_exit': function('s:updateSuccessNeovim')
+          \ })
   endfunction
 
   "Updating notebook for vim
@@ -158,3 +159,5 @@ endfunction
 function! vimpyter#getOriginalFile()
   echo 'Proxy points to: ' . b:original_file
 endfunction
+
+" vim:set et sw=2 cc=80:
